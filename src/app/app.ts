@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -9,4 +10,9 @@ import { RouterOutlet } from '@angular/router';
 })
 export class App {
   protected readonly title = signal('solo-leveling');
+
+  http=inject(HttpClient)
+  
+
+
 }

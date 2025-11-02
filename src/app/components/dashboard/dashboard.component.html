@@ -1,0 +1,64 @@
+<mat-sidenav-container autosize="true" class="cont">
+  <mat-sidenav opened="true" class="sidenav p-2" #sidebar mode="side">
+    <div class="side-cont">
+      <div class="head d-flex align-items-center gap-1">
+        <span><i class="ri-play-list-line fs-4"></i></span>
+        <h4>Your Library</h4>
+      </div>
+      <div class="songsFromPlaylist mt-1">
+        <mat-nav-list>
+          @for (song of playListSongs; track $index) {
+          <mat-list-item (click)="playSong(song.videoId, $index)" class="songItem">
+            <mat-icon matListIcon class="mat-18">music_note</mat-icon>
+            <span matLine>{{ song.title }}</span>
+          </mat-list-item>
+
+          }
+        </mat-nav-list>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main">
+    <header class="d-flex align-items-center gap-5">
+      <h3>Welcome {{ user.name.split(' ')[0] }}</h3>
+      <div class="search-box">
+        <i class="ri-search-line"></i>
+        <input type="text" placeholder="Search..." />
+      </div>
+    </header>
+    <div class="songs mt-3">
+      <div class="playlist">
+        <h3>Popular Playlist</h3>
+
+        <div class="songs-container">
+          <mat-card
+            class="song-card"
+            *ngFor="let playlist of playlistIDs"
+            (click)="fetchPlaylist(playlist.id)"
+          >
+            <img mat-card-image [src]="playlist.img" alt="{{ playlist.name }}" />
+
+            <mat-card-content>
+              <h4>{{ playlist.artistName }}</h4>
+              <p>{{ playlist.description }}</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+      
+      </div>
+      <h3>Artists</h3>
+  <div class="bottom-player">
+          <iframe
+            #music
+            id="playerIframe"
+            src="https://www.youtube.com/embed?list=PL5DigwkkJqqR439Nr1LJxaSuU1liDW7pJ&autoplay=1&controls=1&modestbranding=1&rel=0&iv_load_policy=3&color=white"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+          ></iframe>
+        </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
