@@ -1,0 +1,27 @@
+.spotify-dialog .mat-dialog-container {
+  background: #121212 !important;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0 !important;
+}
+
+.dialog-container .form-control {
+  background: #1f1f1f;
+  border: 1px solid #3f3f3f;
+  color: white;
+}
+
+.dialog-container .form-control:focus {
+  border-color: #1db954 !important;
+  box-shadow: none;
+}
+
+.btn-spotify {
+  background: #1db954;
+  border: none;
+  color: #000 !important;
+  font-weight: 600;
+}
+.btn-spotify:hover {
+  background: #1ed760;
+}

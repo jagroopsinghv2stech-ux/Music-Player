@@ -1,0 +1,18 @@
+<div class="dialog-container bg-dark">
+  <div class="header">
+    <img [src]="artist.img" />
+  </div>
+
+  <div class="content">
+    <h2>{{ artist.artistName }}</h2>
+    <p>Listen to top tracks and albums.</p>
+
+    <button mat-flat-button  class="play-btn" >
+      <mat-icon>play_arrow</mat-icon> Play Playlist
+    </button>
+  </div>
+
+  <button mat-icon-button class="close-btn text-black" (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>

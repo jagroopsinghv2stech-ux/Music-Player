@@ -16,9 +16,14 @@ export class PlayerService {
   //   }
   getSongs(query: string): Observable<any> {
     const apiKey = 'AIzaSyCmSmwgOfF-7kVBzABM4VbxvcICkW8T85A';
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(
-      query
-    )}&key=${apiKey}&maxResults=10`;
+    const url =
+      `https://www.googleapis.com/youtube/v3/search?` +
+      `part=snippet` +
+      `&type=video` +
+      `&videoCategoryId=10` + 
+      `&q=${encodeURIComponent(query)}` +
+      `&maxResults=4` +
+      `&key=${apiKey}`;
     return this.http.get(url);
   }
 

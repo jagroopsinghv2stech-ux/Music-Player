@@ -1,1 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+.artist-dialog-panel .mdc-dialog__surface {
+  background: #181818 !important;
+  color: white !important;
+  border-radius: 16px !important;
+  padding: 0;
+}

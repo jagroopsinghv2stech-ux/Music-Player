@@ -1,0 +1,34 @@
+<div class="dialog-container p-3 bg-dark">
+
+  <h2 class="text-center mb-3 text-light">Add Playlist</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <div class="mb-3">
+      <label class="form-label text-light">Playlist ID</label>
+      <input type="text" formControlName="id" class="form-control" placeholder="Enter Playlist ID">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label text-light">Image URL</label>
+      <input type="text" formControlName="img" class="form-control" placeholder="Enter image link">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label text-light">PlayList Name</label>
+      <input type="text" formControlName="artistName" class="form-control" placeholder="Enter artist name">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label text-light">Description</label>
+      <textarea rows="3" formControlName="description" class="form-control" placeholder="Enter description"></textarea>
+    </div>
+
+    <div class="d-flex justify-content-end mt-4">
+      <button type="button" class="btn btn-outline-light me-2" (click)="dialogRef.close()">Cancel</button>
+      <button type="submit" class="btn btn-spotify" [disabled]="form.invalid">Save</button>
+    </div>
+
+  </form>
+
+</div>

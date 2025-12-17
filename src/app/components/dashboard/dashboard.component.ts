@@ -11,7 +11,15 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { NgFor } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
-import {MatDialogModule} from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ArtistInterface } from '../../interfaces/Artist';
+import { ArtistDialogComponent } from '../artist-dialog/artist-dialog.component';
+import { debounceTime, fromEvent, map, switchMap } from 'rxjs';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { ReactiveFormsModule } from '@angular/forms';
+import { AddPlaylistModelComponent } from '../addPlaylistModel/addPlaylistModel.component';
+import {MatTabsModule} from '@angular/material/tabs';
 
 declare var YT: any;
 @Component({
@@ -27,14 +35,22 @@ declare var YT: any;
     MatCardModule,
     NgFor,
     MatListModule,
+    MatProgressSpinnerModule,
+    MatDialogModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    MatTabsModule
   ],
 })
 export class DashboardComponent implements OnInit {
   public player = inject(PlayerService);
+  public dialog = inject(MatDialog);
 
   @ViewChild('music') music!: ElementRef<HTMLIFrameElement>;
+  @ViewChild('searchInput') searchInput!: ElementRef;
   user: any;
   songs: any = [];
+  isLoading = false;
 
   playlistIDs = [
     {
@@ -53,7 +69,7 @@ export class DashboardComponent implements OnInit {
     },
     {
       name: 'Chill',
-      id: 'PLYe‑Fi7xbhY8bHDdlMcj6DPxVPmBsZ76x',
+      id: 'PLr-XCZlklEPDuf2KvOKNqujTbPpyRTdZm',
       img: 'https://atd-bloges.s3.us-east-2.amazonaws.com/wp-content/uploads/2022/04/16143223/playlist-covers-spotify-10.webp',
       artistName: 'Weekend',
       description: 'Latest Music from Weekend',
@@ -67,6 +83,26 @@ export class DashboardComponent implements OnInit {
     },
   ];
   playListSongs: any[] = [];
+
+  //!
+  artists = [
+    {
+      name: 'Arijit Singh',
+      image: 'https://i.scdn.co/image/ab6761610000e5eb6cbf5bd1c9fa00f8d96ee574',
+    },
+    {
+      name: 'Shreya Ghoshal',
+      image: 'https://i.scdn.co/image/ab6761610000e5ebb6d05336df89f8a2511f25a7',
+    },
+    {
+      name: 'AP Dhillon',
+      image: 'https://i.scdn.co/image/ab6761610000e5eb9b32f10a9cda8f5cd7e7d85f',
+    },
+    {
+      name: 'Anushka Sharma',
+      image: 'https://i.scdn.co/image/ab6761610000e5eb1f5c46bada49735cea90c0c0',
+    },
+  ];
   currentSongIndex: number = 0;
 
   song!: any;
@@ -74,7 +110,7 @@ export class DashboardComponent implements OnInit {
   // url = 'https://www.youtube.com/embed/' + this.song;
 
   constructor(private authService: AuthServiceService, private router: Router) {
-    this.user = this.authService.getUser();
+    this.user = this.authService.getUser();    
   }
 
   ngOnInit() {
@@ -105,11 +141,31 @@ export class DashboardComponent implements OnInit {
         },
       },
     });
+
+    fromEvent(this.searchInput.nativeElement, 'input')
+      .pipe(
+        map((event: any) => event.target.value),
+        debounceTime(500),
+        switchMap((value) => this.player.getSongs(value)) 
+      )
+      .subscribe((data: any) => {
+        this.songs = data.items;
+        console.log(this.songs, 'songs');
+      });
+  }
+
+  openArtistModal(artist: any) {
+    console.log(artist);
+
+    this.dialog.open(ArtistDialogComponent, {
+      width: '1000px',
+      data: artist,
+    });
   }
   playNext() {
     this.currentSongIndex++;
     console.log(this.currentSongIndex);
-    
+
     if (this.currentSongIndex >= this.playListSongs.length) {
       this.currentSongIndex = 0; // loop playlist
     }
@@ -138,26 +194,69 @@ export class DashboardComponent implements OnInit {
     console.log('Player is ready');
   }
 
+  onSearch(event: any) {
+    console.log(event.target.value);
+    // this.player.getSongs(event.target.value).subscribe((data) => {
+    //   console.log(data);
+    //   this.songs = data.items;
+    // });
+  }
+
   //! GET THE SONG
   playSong(songId: string, index: number) {
     this.currentSongIndex = index;
     const iframe = document.getElementById('playerIframe') as HTMLIFrameElement;
     iframe.src = `https://www.youtube.com/embed/${songId}?autoplay=1&mute=0&controls=2&modestbranding=1&rel=0&enablejsapi=1`;
+    this.searchInput.nativeElement.value = '';
   }
+
 
   //! GET THE PLAYLIST
   fetchPlaylist(id: string) {
     console.log(id);
+    this.isLoading = true;
     let playlist = localStorage.getItem(`playlist-${id}`);
     if (playlist) {
       this.playListSongs = JSON.parse(playlist);
+      console.log(this.playListSongs);
+      
+      this.isLoading = false;
       return;
     }
 
     this.player.getPlaylistFromRSS(id).subscribe((data) => {
-      console.log(data);
       this.playListSongs = data;
+      this.isLoading = false;
       localStorage.setItem(`playlist-${id}`, JSON.stringify(this.playListSongs));
     });
+  }
+  showArtist(obj: ArtistInterface) {
+    this.openArtistModal(obj);
+  }
+  openAddPlaylistDialog() {
+    this.dialog.open(AddPlaylistModelComponent, {
+      width: '500px',
+    });
+  }
+
+  addPlaylist(){
+    this.openAddPlaylistDialog()
+  }
+
+  formatSongName(songName:string){
+    if(songName.includes(' - ')){
+      return songName.split(' -')[1]
+    }
+    else if(songName.includes('| ')){
+      return songName.split(' -')[0]
+    }
+
+
+    
+
+
+
+    return songName
+
   }
 }
