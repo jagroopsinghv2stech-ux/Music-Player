@@ -19,7 +19,7 @@ import { debounceTime, fromEvent, map, switchMap } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AddPlaylistModelComponent } from '../addPlaylistModel/addPlaylistModel.component';
-import {MatTabsModule} from '@angular/material/tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 
 declare var YT: any;
 @Component({
@@ -39,7 +39,7 @@ declare var YT: any;
     MatDialogModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
-    MatTabsModule
+    MatTabsModule,
   ],
 })
 export class DashboardComponent implements OnInit {
@@ -51,6 +51,7 @@ export class DashboardComponent implements OnInit {
   user: any;
   songs: any = [];
   isLoading = false;
+  isMobile = false;
 
   playlistIDs = [
     {
@@ -70,7 +71,7 @@ export class DashboardComponent implements OnInit {
     {
       name: 'Chill',
       id: 'PLr-XCZlklEPDuf2KvOKNqujTbPpyRTdZm',
-      img: 'https://atd-bloges.s3.us-east-2.amazonaws.com/wp-content/uploads/2022/04/16143223/playlist-covers-spotify-10.webp',
+      img: 'https://img.freepik.com/free-vector/gradient-album-cover-template_23-2150597431.jpg?semt=ais_hybrid&w=740&q=80',
       artistName: 'Weekend',
       description: 'Latest Music from Weekend',
     },
@@ -109,22 +110,17 @@ export class DashboardComponent implements OnInit {
   musicPlayer: any;
   // url = 'https://www.youtube.com/embed/' + this.song;
 
-  constructor(private authService: AuthServiceService, private router: Router) {
-    this.user = this.authService.getUser();    
+  constructor(
+    private authService: AuthServiceService,
+    private router: Router,
+  ) {
+    this.user = this.authService.getUser() || null;
   }
 
   ngOnInit() {
     let song = 'star Boy';
-    // this.player.getSongs(song).subscribe(data => {
-    //   console.log(data)
-    //   this.songs=data.items
-    //   // console.log(this.songs);
-    //   song=this.songs[0].id.videoId
-    //   let iframe = document.getElementById('iframe')
-    //   console.log(song);
-    //   iframe!.setAttribute('src','https://www.youtube.com/embed/'+song)
-
-    // })
+    this.checkScreen();
+    window.addEventListener('resize', () => this.checkScreen());
   }
   ngAfterViewInit() {
     // Initialize YouTube player via API
@@ -146,7 +142,7 @@ export class DashboardComponent implements OnInit {
       .pipe(
         map((event: any) => event.target.value),
         debounceTime(500),
-        switchMap((value) => this.player.getSongs(value)) 
+        switchMap((value) => this.player.getSongs(value)),
       )
       .subscribe((data: any) => {
         this.songs = data.items;
@@ -210,7 +206,6 @@ export class DashboardComponent implements OnInit {
     this.searchInput.nativeElement.value = '';
   }
 
-
   //! GET THE PLAYLIST
   fetchPlaylist(id: string) {
     console.log(id);
@@ -219,12 +214,12 @@ export class DashboardComponent implements OnInit {
     if (playlist) {
       this.playListSongs = JSON.parse(playlist);
       console.log(this.playListSongs);
-      
       this.isLoading = false;
       return;
     }
 
     this.player.getPlaylistFromRSS(id).subscribe((data) => {
+      console.log(data);
       this.playListSongs = data;
       this.isLoading = false;
       localStorage.setItem(`playlist-${id}`, JSON.stringify(this.playListSongs));
@@ -239,24 +234,20 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  addPlaylist(){
-    this.openAddPlaylistDialog()
+  addPlaylist() {
+    this.openAddPlaylistDialog();
   }
 
-  formatSongName(songName:string){
-    if(songName.includes(' - ')){
-      return songName.split(' -')[1]
+  formatSongName(songName: string) {
+    if (songName.includes(' - ')) {
+      return songName.split(' -')[1];
+    } else if (songName.includes('| ')) {
+      return songName.split(' -')[0];
     }
-    else if(songName.includes('| ')){
-      return songName.split(' -')[0]
-    }
+    return songName;
+  }
 
-
-    
-
-
-
-    return songName
-
+  checkScreen() {
+    this.isMobile = window.innerWidth < 768;
   }
 }
