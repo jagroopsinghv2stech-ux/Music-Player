@@ -21,7 +21,7 @@
         } @else {
           <mat-nav-list>
             @for (song of playListSongs; track $index) {
-              <mat-list-item (click)="playSong(song.videoId, $index)" class="songItem">
+              <mat-list-item (click)="playSongfromLib(song.videoId, $index)" class="songItem">
                 <mat-icon matListIcon class="mat-18">album</mat-icon>
                 <span matLine>{{ formatSongName(song.title) }}</span>
               </mat-list-item>
@@ -33,15 +33,12 @@
   </mat-sidenav>
 
   <mat-sidenav-content class="main">
-    <header class="d-flex align-items-center justify-content-start gap-5">
-      <button class="bg-black"
-        mat-icon-button
-        class="menu-btn"
-        (click)="sidebar.toggle()">
+    <header class="d-flex flex-wrap align-items-center justify-content-start gap-1 gap-lg-5 ">
+      <div class="bg-black p-2" mat-icon-button class="menu-btn" (click)="sidebar.toggle()">
         <mat-icon>menu</mat-icon>
-      </button>
+      </div>
       <!-- <h3>Welcome {{ user.name.split(' ')[0] }}</h3> -->
-      <mat-form-field class="search-box" appearance="outline">
+      <mat-form-field class="search-box" appearance="fill">
         <mat-label>Search Songs</mat-label>
         <input
           type="text"
@@ -52,22 +49,33 @@
         />
         <mat-autocomplete #auto="matAutocomplete">
           <mat-option
-            *ngFor="let song of songs"
+            class="bg-black d-flex gap-2"
+            *ngFor="let song of searchedSongs"
             [value]="song.snippet.title"
             (click)="playSong(song.id.videoId, 0)"
           >
-            <img [src]="song.snippet.thumbnails.default.url" alt="thumb" width="60" height="60" />
-            <span>{{ song.snippet.title.split('|')[0] }}</span>
+            <div class="d-flex justify-content-center align-items-center gap-4">
+              <img
+                [src]="song.snippet.thumbnails.default.url"
+                class="border-1"
+                alt="thumb"
+                width="60"
+                height="60"
+              />
+              <span>{{ song.snippet.title.split('|')[0] }}</span>
+            </div>
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-      <button
+      <!-- <button
         class="btn btn-primary position-absolute end-0 mx-3"
         mat-raised-button
         (click)="addPlaylist()"
       >
         Add Playlist
-      </button>
+      </button> -->
+      <!-- From Uiverse.io by cssbuttons-io -->
+      <!-- <button class="" (click)="refreshPlaylist()">Refresh Playlist</button> -->
     </header>
     <div class="songs mt-3">
       <div class="playlist">
@@ -89,53 +97,11 @@
         </div>
       </div>
 
-      <div class="tab-container p-lg-5">
-        <!-- !MAt TAB  -->
-        <mat-tab-group dynamicHeight animationDuration="1000ms">
-          <mat-tab>
-            <ng-template mat-tab-label>
-              <div class="d-flex justify-content-center align-items-center gap-2">
-                <mat-icon class="example-tab-icon">audiotrack</mat-icon>
-                <h5>Popular Albums</h5>
-              </div>
-            </ng-template>
-            <div class="songs-container">
-              <!-- @for (item of items; track $index) {} -->
-            </div>
-          </mat-tab>
-          <mat-tab>
-            <ng-template mat-tab-label>
-              <mat-icon class="example-tab-icon">thumb_down</mat-icon>
-            </ng-template>
-            <!--! ARTISTSSSS -->
-            <div class="playlist">
-              <h3>Popular Artist</h3>
-
-              <div class="songs-container">
-                <mat-card
-                  class="song-card"
-                  *ngFor="let playlist of playlistIDs"
-                  (click)="showArtist(playlist)"
-                >
-                  <img mat-card-image [src]="playlist.img" alt="{{ playlist.name }}" />
-
-                  <mat-card-content>
-                    <h4>{{ playlist.artistName }}</h4>
-                    <p>{{ playlist.description }}</p>
-                  </mat-card-content>
-                </mat-card>
-              </div>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
-      </div>
-
       <!-- !Music Bar  -->
       <div class="bottom-player">
         <iframe
           #music
           id="playerIframe"
-          src="https://www.youtube.com/embed?list=PL5DigwkkJqqR439Nr1LJxaSuU1liDW7pJ&autoplay=0&controls=1&modestbranding=1&rel=0&iv_load_policy=3&color=black"
           frameborder="0"
           allow="autoplay; encrypted-media"
           allowfullscreen

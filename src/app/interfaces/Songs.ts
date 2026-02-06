@@ -1,0 +1,73 @@
+export const playlistIDs = [
+  {
+    name: 'Karan Aujla',
+    id: 'PL5DigwkkJqqR439Nr1LJxaSuU1liDW7pJ',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2hNWP0r-AuoQQGR6YhiLSFmfUsSon7BWlo4wqs_tMAQkGwnpNG218nQU1cJ2tJOv8Hf76NIayPeoflBMelBDubgy34faIm84swEvR6VYf&s=10',
+    artistName: 'Karan Aujla',
+    description: 'Latest Music from Karan Aujla',
+  },
+  {
+    name: 'Chill',
+    id: 'PLO7-VO1D0_6NYoMAN0XncJu4tvibirSmN',
+    img: 'https://charts-images.scdn.co/assets/locale_en/regional/weekly/region_in_default.jpg',
+    artistName: 'Popular Music',
+    description: 'Latest Music',
+  },
+  {
+    name: 'Chill',
+    id: 'PLr-XCZlklEPDuf2KvOKNqujTbPpyRTdZm',
+    img: 'https://img.freepik.com/free-vector/gradient-album-cover-template_23-2150597431.jpg?semt=ais_hybrid&w=740&q=80',
+    artistName: 'Weekend',
+    description: 'Latest Music from Weekend',
+  },
+  {
+    name: 'Chill',
+    id: 'PLpXNKj0kuGdft-RYefkaVOOe3leymof6G',
+    img: 'https://i.pinimg.com/originals/90/e3/41/90e34121229253d293dcd6e8e40b6f44.jpg',
+    artistName: 'My Playlist',
+    description: 'Latest Music from My Playlist',
+  },
+  //! chnage from here
+  {
+    name: 'prachi',
+    id: 'PL_qFA8XWtuJ3A89zQeThqq36MvKuTwwRI',
+    artistName: 'kuch bhi',
+    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR65lsdF95BNi9K6saBGEqaZ79fKR4xg-5wHw&s',
+    description: 'Latest Music from My Playlist',
+  },
+  {
+    name: 'Chill',
+    id: 'PLDIoUOhQQPlWm_njQtKkNIk5RYSGgzomm',
+    img: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/music-album-cover-design%2C-album-cover-art-tem-template-87b3d9a00d8cc8327d083fb56e78ba71_screen.jpg?ts=1710307828',
+    artistName: 'Top 2026 Hits',
+    description: 'Latest Music',
+  },
+  {
+    name: 'prachi',
+    id:'PL_qFA8XWtuJ3p1JEOZvnBezIiYgd8FiJf',
+    artistName: 'kuch bhi part 2',
+    img: 'https://i.pinimg.com/236x/4f/a0/9d/4fa09d05708a9cc16ad6644cd5669576.jpg',
+    description: 'Latest Music from My Playlist',
+  },
+  {
+    name: 'Chill',
+    id: 'PLplXQ2cg9B_qrCVd1J_iId5SvP8Kf_BfS',
+    img: 'https://www.shutterstock.com/image-vector/musical-poster-your-design-music-260nw-2598588625.jpg',
+    artistName: 'Top Songs of the Decade',
+    description: 'Latest Music',
+  },
+  {
+    name: 'Chill',
+    id: 'PLWUuMxUJvnuKDF9DncRGZPKssW0G7uyLi',
+    img: 'https://i.pinimg.com/236x/43/be/3a/43be3aaa26ca4353abc977c96e8d13ca.jpg',
+    artistName: 'Best Music 2000 to 2026 Playlist ',
+    description: 'Latest Music',
+  },
+  {
+    name: 'Chill',
+    id: 'PLgzTt0k8mXzEk586ze4BjvDXR7c-TUSnx',
+    img: 'https://i.pinimg.com/474x/72/f8/53/72f853d3a38b8f5666259997a18bacf0.jpg',
+    artistName: 'Best Music 2000 to 2026 Playlist ',
+    description: 'Latest Music',
+  },
+];

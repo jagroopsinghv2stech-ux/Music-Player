@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, signal, Signal, ViewChild } from '@angular/core';
 import { PlayerService } from '../../services/player.service';
 import { AuthServiceService } from '../../services/auth-service.service';
 import { Router } from '@angular/router';
@@ -20,6 +20,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AddPlaylistModelComponent } from '../addPlaylistModel/addPlaylistModel.component';
 import { MatTabsModule } from '@angular/material/tabs';
+import { playlistIDs } from '../../interfaces/Songs';
 
 declare var YT: any;
 @Component({
@@ -43,48 +44,24 @@ declare var YT: any;
   ],
 })
 export class DashboardComponent implements OnInit {
-  public player = inject(PlayerService);
+  public service = inject(PlayerService);
   public dialog = inject(MatDialog);
 
   @ViewChild('music') music!: ElementRef<HTMLIFrameElement>;
   @ViewChild('searchInput') searchInput!: ElementRef;
-  user: any;
-  songs: any = [];
+  iframe!: HTMLIFrameElement;
+
+  staticParams = '&autoplay=1&controls=1&modestbranding=0&rel=0&iv_load_policy=3&color=black';
+
   isLoading = false;
   isMobile = false;
+  currentPlaylistId = signal('PL5DigwkkJqqR439Nr1LJxaSuU1liDW7pJ');
 
-  playlistIDs = [
-    {
-      name: 'Karan Aujla',
-      id: 'PL5DigwkkJqqR439Nr1LJxaSuU1liDW7pJ',
-      img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2hNWP0r-AuoQQGR6YhiLSFmfUsSon7BWlo4wqs_tMAQkGwnpNG218nQU1cJ2tJOv8Hf76NIayPeoflBMelBDubgy34faIm84swEvR6VYf&s=10',
-      artistName: 'Karan Aujla',
-      description: 'Latest Music from Karan Aujla',
-    },
-    {
-      name: 'Chill',
-      id: 'PLO7-VO1D0_6NYoMAN0XncJu4tvibirSmN',
-      img: 'https://charts-images.scdn.co/assets/locale_en/regional/weekly/region_in_default.jpg',
-      artistName: 'Popular Music',
-      description: 'Latest Music',
-    },
-    {
-      name: 'Chill',
-      id: 'PLr-XCZlklEPDuf2KvOKNqujTbPpyRTdZm',
-      img: 'https://img.freepik.com/free-vector/gradient-album-cover-template_23-2150597431.jpg?semt=ais_hybrid&w=740&q=80',
-      artistName: 'Weekend',
-      description: 'Latest Music from Weekend',
-    },
-    {
-      name: 'Chill',
-      id: 'PLpXNKj0kuGdft-RYefkaVOOe3leymof6G',
-      img: 'https://i.pinimg.com/originals/90/e3/41/90e34121229253d293dcd6e8e40b6f44.jpg',
-      artistName: 'My Playlist',
-      description: 'Latest Music from My Playlist',
-    },
-  ];
+  baseUrl = `https://www.youtube.com/embed?list=${this.currentPlaylistId()}${this.staticParams}`;
+
+  playlistIDs = playlistIDs;
   playListSongs: any[] = [];
-
+  searchedSongs: any[] = [];
   //!
   artists = [
     {
@@ -104,140 +81,59 @@ export class DashboardComponent implements OnInit {
       image: 'https://i.scdn.co/image/ab6761610000e5eb1f5c46bada49735cea90c0c0',
     },
   ];
-  currentSongIndex: number = 0;
-
-  song!: any;
-  musicPlayer: any;
-  // url = 'https://www.youtube.com/embed/' + this.song;
-
-  constructor(
-    private authService: AuthServiceService,
-    private router: Router,
-  ) {
-    this.user = this.authService.getUser() || null;
-  }
+  constructor() {}
 
   ngOnInit() {
-    let song = 'star Boy';
     this.checkScreen();
     window.addEventListener('resize', () => this.checkScreen());
   }
   ngAfterViewInit() {
-    // Initialize YouTube player via API
-    this.musicPlayer = new YT.Player(this.music.nativeElement, {
-      events: {
-        onReady: (event: any) => {
-          console.log('Player ready');
-        },
-        onStateChange: (event: any) => {
-          if (event.data === YT.PlayerState.ENDED) {
-            console.log('Video ended');
-            this.playNext();
-          }
-        },
-      },
-    });
+    this.iframe = document.getElementById('playerIframe') as HTMLIFrameElement;
+    this.iframe.src = this.baseUrl;
 
     fromEvent(this.searchInput.nativeElement, 'input')
       .pipe(
         map((event: any) => event.target.value),
         debounceTime(500),
-        switchMap((value) => this.player.getSongs(value)),
+        switchMap((value) => this.service.getSongs(value)),
       )
       .subscribe((data: any) => {
-        this.songs = data.items;
-        console.log(this.songs, 'songs');
+        this.searchedSongs = data.items;
+        console.log(this.searchedSongs, 'songs');
       });
   }
 
-  openArtistModal(artist: any) {
-    console.log(artist);
+  playSongfromLib(videoId: string, index: number) {
+    console.log(index);
 
-    this.dialog.open(ArtistDialogComponent, {
-      width: '1000px',
-      data: artist,
+    this.iframe.src =
+      `https://www.youtube.com/embed/${videoId}` +
+      `?list=${this.currentPlaylistId()}` +
+      `&index=${index}${this.staticParams}`;
+  }
+
+  fetchPlaylist(playlist_id: string) {
+    this.service.getPlaylistFromRSS(playlist_id).subscribe((data) => {
+      this.playListSongs = data;
     });
+    console.log(this.playListSongs);
+    this.setIframePlaylistId(playlist_id);
   }
-  playNext() {
-    this.currentSongIndex++;
-    console.log(this.currentSongIndex);
-
-    if (this.currentSongIndex >= this.playListSongs.length) {
-      this.currentSongIndex = 0; // loop playlist
-    }
-
-    const nextSong = this.playListSongs[this.currentSongIndex].videoId;
-    this.playSong(nextSong, this.currentSongIndex);
-  }
-
-  initializePlayer() {
-    this.musicPlayer = new YT.Player(this.music.nativeElement, {
-      events: {
-        onReady: this.onPlayerReady.bind(this),
-      },
-    });
-  }
-
-  play() {
-    if (this.musicPlayer && this.musicPlayer.playVideo) {
-      this.musicPlayer.playVideo();
-    } else {
-      console.warn('Player not ready yet');
-    }
-  }
-
-  onPlayerReady(event: any) {
-    console.log('Player is ready');
-  }
-
-  onSearch(event: any) {
-    console.log(event.target.value);
-    // this.player.getSongs(event.target.value).subscribe((data) => {
-    //   console.log(data);
-    //   this.songs = data.items;
-    // });
-  }
-
   //! GET THE SONG
   playSong(songId: string, index: number) {
-    this.currentSongIndex = index;
     const iframe = document.getElementById('playerIframe') as HTMLIFrameElement;
     iframe.src = `https://www.youtube.com/embed/${songId}?autoplay=1&mute=0&controls=2&modestbranding=1&rel=0&enablejsapi=1`;
     this.searchInput.nativeElement.value = '';
   }
-
-  //! GET THE PLAYLIST
-  fetchPlaylist(id: string) {
-    console.log(id);
-    this.isLoading = true;
-    let playlist = localStorage.getItem(`playlist-${id}`);
-    if (playlist) {
-      this.playListSongs = JSON.parse(playlist);
-      console.log(this.playListSongs);
-      this.isLoading = false;
-      return;
-    }
-
-    this.player.getPlaylistFromRSS(id).subscribe((data) => {
-      console.log(data);
-      this.playListSongs = data;
-      this.isLoading = false;
-      localStorage.setItem(`playlist-${id}`, JSON.stringify(this.playListSongs));
-    });
-  }
-  showArtist(obj: ArtistInterface) {
-    this.openArtistModal(obj);
-  }
-  openAddPlaylistDialog() {
-    this.dialog.open(AddPlaylistModelComponent, {
-      width: '500px',
-    });
+  //! Update the playlist
+  refreshPlaylist() {
+    localStorage.clear();
   }
 
-  addPlaylist() {
-    this.openAddPlaylistDialog();
+  //! Helpers
+  checkScreen() {
+    this.isMobile = window.innerWidth < 768;
   }
-
   formatSongName(songName: string) {
     if (songName.includes(' - ')) {
       return songName.split(' -')[1];
@@ -247,7 +143,9 @@ export class DashboardComponent implements OnInit {
     return songName;
   }
 
-  checkScreen() {
-    this.isMobile = window.innerWidth < 768;
+  setIframePlaylistId(playlistId: string) {
+    this.baseUrl = `https://www.youtube.com/embed?list=${playlistId}${this.staticParams}`;
+    this.currentPlaylistId.set(playlistId);
+    this.iframe.src = this.baseUrl;
   }
 }
