@@ -1,5 +1,5 @@
 import { Component, ElementRef, inject, OnInit, signal, Signal, ViewChild } from '@angular/core';
-import { PlayerService } from '../../services/player.service';
+import { PlayerService, PlaylistVideo } from '../../services/player.service';
 import { AuthServiceService } from '../../services/auth-service.service';
 import { Router } from '@angular/router';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
@@ -112,13 +112,45 @@ export class DashboardComponent implements OnInit {
       `&index=${index}${this.staticParams}`;
   }
 
-  fetchPlaylist(playlist_id: string) {
-    this.service.getPlaylistFromRSS(playlist_id).subscribe((data) => {
-      this.playListSongs = data;
-    });
-    console.log(this.playListSongs);
-    this.setIframePlaylistId(playlist_id);
+fetchPlaylist(playlist_id: string) {
+  const cacheKey = `playlist_${playlist_id}`;
+  const cached = localStorage.getItem(cacheKey);
+
+  // 1. Try cache first
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    const SIX_HOURS = 6 * 60 * 60 * 1000;
+
+    if (Date.now() - parsed.cachedAt < SIX_HOURS) {
+      this.playListSongs = parsed.videos;
+      console.log('Playlist loaded from cache');
+      this.setIframePlaylistId(playlist_id);
+      return;
+    }
   }
+
+  // 2. Fetch from service (Cloudflare Worker RSS)
+  this.service.getPlaylist(playlist_id).subscribe({
+    next: (data) => {
+      this.playListSongs = data;
+
+      // Save to cache
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({
+          cachedAt: Date.now(),
+          videos: data,
+        })
+      );
+
+      console.log('Playlist loaded from network');
+      this.setIframePlaylistId(playlist_id);
+    },
+    error: (error) => {
+      console.error('Failed to fetch playlist:', error);
+    },
+  });
+}
   //! GET THE SONG
   playSong(songId: string, index: number) {
     const iframe = document.getElementById('playerIframe') as HTMLIFrameElement;
@@ -148,4 +180,6 @@ export class DashboardComponent implements OnInit {
     this.currentPlaylistId.set(playlistId);
     this.iframe.src = this.baseUrl;
   }
+
+
 }
