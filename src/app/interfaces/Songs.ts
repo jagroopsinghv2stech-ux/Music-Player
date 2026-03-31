@@ -8,9 +8,9 @@ export const playlistIDs = [
   },
   {
     name: 'Chill',
-    id: 'PLO7-VO1D0_6NYoMAN0XncJu4tvibirSmN',
-    img: 'https://charts-images.scdn.co/assets/locale_en/regional/weekly/region_in_default.jpg',
-    artistName: 'Popular Music',
+    id: 'PLmkMkPckktvmERGwZxKJhLrmU4yaKWkN9',
+    img: 'https://i.pinimg.com/736x/0f/93/ed/0f93ed2fc4089af60f86f437163df345.jpg',
+    artistName: 'Yash',
     description: 'Latest Music',
   },
   {
