@@ -51,9 +51,9 @@ export const playlistIDs = [
   },
   {
     name: 'Chill',
-    id: 'PLplXQ2cg9B_qrCVd1J_iId5SvP8Kf_BfS',
-    img: 'https://www.shutterstock.com/image-vector/musical-poster-your-design-music-260nw-2598588625.jpg',
-    artistName: 'Top Songs of the Decade',
+    id: 'PLgry1LXljWgSp9Ugz6A1bEM8lraDzq5P5',
+    img: '/cover.png',
+    artistName: 'Maze Essar',
     description: 'Latest Music',
   },
   {
